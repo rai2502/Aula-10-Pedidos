@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Bella Italia - Painel de Controle</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght=100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        barlow: ['Barlow', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3A5F43',
+                        dark: '#222222',
+                        muted: '#999999',
+                        footer: '#333333',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg: #F9FAFB;
+            --surface: #ffffff;
+            --primary: #3A5F43;
+            --dark: #222222;
+            --muted: #999999;
+            --border: #E5E7EB;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            font-family: 'Barlow', sans-serif;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+
+        .border-primary {
+            border-color: var(--primary) !important;
+        }
+
+        /* Esconde a barra de rolagem mantendo a funcionalidade */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="font-barlow text-dark bg-[#F9FAFB] min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="bg-primary text-white p-3 rounded-xl shadow-md flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-wider text-dark">LA BELLA ITALIA</h1>
+                    <p class="text-xs font-semibold text-primary uppercase tracking-widest">Painel da Cozinha / Italiana</p>
+                </div>
+            </div>
+
+            <nav class="flex space-x-2 bg-gray-100 p-1.5 rounded-xl">
+                <button id="tab-pedidos" onclick="switchTab('pedidos')"
+                    class="px-5 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-200 bg-white text-primary shadow-sm">
+                    Pedidos Ativos
+                </button>
+                <button id="tab-categorias" onclick="switchTab('categorias')"
+                    class="px-5 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-200 text-gray-600 hover:text-dark">
+                    Categorias
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section id="section-pedidos" class="block">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-dark tracking-tight">Fila de Preparo</h2>
+                    <p class="text-sm text-gray-500 mt-0.5">Gerencie os pedidos em tempo real.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 bg-gray-100 p-1 rounded-xl self-start md:self-auto">
+                    <button onclick="filtrarPedidos('TODOS')" id="btn-filtro-TODOS" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all bg-white text-dark shadow-sm">
+                        Todos
+                    </button>
+                    <button onclick="filtrarPedidos('PENDENTE')" id="btn-filtro-PENDENTE" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all text-gray-600 hover:text-dark">
+                        Pendentes
+                    </button>
+                    <button onclick="filtrarPedidos('PREPARANDO')" id="btn-filtro-PREPARANDO" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all text-gray-600 hover:text-dark">
+                        Em Preparo
+                    </button>
+                    <button onclick="filtrarPedidos('PRONTO')" id="btn-filtro-PRONTO" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all text-gray-600 hover:text-dark">
+                        Prontos
+                    </button>
+                </div>
+            </div>
+
+            <div id="grid-pedidos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="col-span-full text-center py-12 text-gray-500 font-medium">
+                    Carregando pedidos da fila...
+                </div>
+            </div>
+        </section>
+
+        <section id="section-categorias" class="hidden">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-dark tracking-tight">Gerenciar Categorias</h2>
+                    <p class="text-sm text-gray-500 mt-0.5">Adicione ou remova categorias do cardápio.</p>
+                </div>
+                <button onclick="abrirModalAddCat()" class="bg-primary hover:bg-opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Nova Categorias
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-500">
+                                <th class="px-6 py-4">ID</th>
+                                <th class="px-6 py-4">Nome da Categoria</th>
+                                <th class="px-6 py-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-categorias-body" class="divide-y divide-gray-100 text-sm font-medium text-gray-700">
+                            <tr>
+                                <td colspan="3" class="px-6 py-8 text-center text-gray-500">Carregando categorias...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-4 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs font-semibold text-muted tracking-wide uppercase">
+            &copy; 2026 La Bella Italia - Sistema de Cozinha Interno.
+        </div>
+    </footer>
+
+    <div id="modal-pedido" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col">
+            <div class="p-6 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 id="modal-pedido-titulo" class="text-lg font-black text-dark">Pedido #0000</h3>
+                    <p id="modal-pedido-cliente" class="text-xs text-gray-500 font-semibold uppercase tracking-wider mt-0.5">Cliente: --</p>
+                </div>
+                <button onclick="fecharModalPedido()" class="text-gray-400 hover:text-gray-600 bg-gray-200/50 p-2 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <div id="modal-pedido-itens" class="p-6 overflow-y-auto flex-1 divide-y divide-gray-100 no-scrollbar">
+                </div>
+            <div class="p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3" id="modal-pedido-acoes">
+                </div>
+        </div>
+    </div>
+
+    <div id="modal-add-cat" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="p-6 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="text-lg font-black text-dark">Nova Categoria</h3>
+                <button onclick="fecharModalAddCat()" class="text-gray-400 hover:text-gray-600 bg-gray-200/50 p-2 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <form onsubmit="salvarCategoria(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nome da Categoria</label>
+                    <input type="text" id="input-nome-categoria" required placeholder="Ex: Massas, Pizzas, Risotos"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:bg-white font-medium transition-all">
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="fecharModalAddCat()" class="px-5 py-2.5 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100 transition-all">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btn-submit-cat" class="bg-primary hover:bg-opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all">
+                        Salvar Categoria
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-delete-cat" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 p-6 text-center">
+            <div class="mx-auto w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-black text-dark">Excluir Categoria?</h3>
+            <p class="text-sm text-gray-500 mt-2">Esta ação não pode ser desfeita. Todos os produtos vinculados a esta categoria perderão o vínculo.</p>
+            <div class="flex justify-center gap-3 mt-6">
+                <button onclick="fecharModalDeleteCat()" class="px-5 py-2.5 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100 transition-all">
+                    Não, Cancelar
+                </button>
+                <button onclick="confirmarExcluirCategoria()" id="btn-confirmar-excluir-cat" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all">
+                    Sim, Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Configurações de API Endpoints
+        const API_BASE = "https://backend-la-bella-tavola.vercel.app/api";
+        const URL_PEDIDOS = `${API_BASE}/orders`;
+        const URL_CATEGORIAS = `${API_BASE}/categories`;
+
+        // Estados Globais da Aplicação Front-end
+        let activeTab = 'pedidos'; // 'pedidos' | 'categorias'
+        let filtroStatus = 'TODOS'; // 'TODOS' | 'PENDENTE' | 'PREPARANDO' | 'PRONTO'
+        let listaPedidosCache = [];
+        let categoryToDeleteId = null;
+
+        // ==========================================
+        // CONTROLE DE ABAS (TABS)
+        // ==========================================
+        function switchTab(tabName) {
+            activeTab = tabName;
+            
+            const btnPedidos = document.getElementById('tab-pedidos');
+            const btnCategorias = document.getElementById('tab-categorias');
+            const secPedidos = document.getElementById('section-pedidos');
+            const secCategorias = document.getElementById('section-categorias');
+
+            if (tabName === 'pedidos') {
+                // UI Botões
+                btnPedidos.className = "px-5 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-200 bg-white text-primary shadow-sm";
+                btnCategorias.className = "px-5 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-200 text-gray-600 hover:text-dark";
+                // UI Seções
+                secPedidos.classList.replace('hidden', 'block');
+                secCategorias.classList.replace('block', 'hidden');
+                carregarPedidos();
+            } else {
+                // UI Botões
+                btnPedidos.className = "px-5 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-200 text-gray-600 hover:text-dark";
+                btnCategorias.className = "px-5 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-200 bg-white text-primary shadow-sm";
+                // UI Seções
+                secPedidos.classList.replace('block', 'hidden');
+                secCategorias.classList.replace('hidden', 'block');
+                carregarCategoriasCozinha();
+            }
+        }
+
+        // ==========================================
+        // GERENCIAMENTO DE FILAS DE PEDIDOS
+        // ==========================================
+        async function carregarPedidos() {
+            const grid = document.getElementById('grid-pedidos');
+            try {
+                const response = await fetch(URL_PEDIDOS);
+                if (!response.ok) throw new Error("Erro de rede");
+                
+                const pedidos = await response.json();
+                // Filtra para remover finalizados/entregues da tela de exibição da cozinha se necessário
+                // Deixando apenas PENDENTE, PREPARANDO, PRONTO
+                listaPedidosCache = pedidos.filter(p => ['PENDENTE', 'PREPARANDO', 'PRONTO'].includes(p.status));
+                
+                renderizarPedidos();
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-red-500 font-semibold">Falha ao sincronizar pedidos da cozinha. Verifique a conexão API.</div>`;
+            }
+        }
+
+        function filtrarPedidos(status) {
+            filtroStatus = status;
+            // Atualiza botões de filtro na UI
+            ['TODOS', 'PENDENTE', 'PREPARANDO', 'PRONTO'].forEach(s => {
+                const btn = document.getElementById(`btn-filtro-${s}`);
+                if (s === status) {
+                    btn.className = "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all bg-white text-dark shadow-sm";
+                } else {
+                    btn.className = "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all text-gray-600 hover:text-dark";
+                }
+            });
+            renderizarPedidos();
+        }
+
+        function renderizarPedidos() {
+            const grid = document.getElementById('grid-pedidos');
+            
+            // Aplica filtro do cache
+            const pedidosFiltrados = filtroStatus === 'TODOS' 
+                ? listaPedidosCache 
+                : listaPedidosCache.filter(p => p.status === filtroStatus);
+
+            if (pedidosFiltrados.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-16 bg-white rounded-2xl border border-gray-200 text-gray-400 font-medium">Nenhum pedido encontrado nesta etapa (${filtroStatus.toLowerCase()}).</div>`;
+                return;
+            }
+
+            grid.innerHTML = pedidosFiltrados.map(pedido => {
+                // Configurações visuais do Badge por Status
+                let badgeClass = "";
+                let statusTexto = "";
+                if (pedido.status === 'PENDENTE') {
+                    badgeClass = "bg-amber-100 text-amber-800 border-amber-200";
+                    statusTexto = "Pendente";
+                } else if (pedido.status === 'PREPARANDO') {
+                    badgeClass = "bg-blue-100 text-blue-800 border-blue-200";
+                    statusTexto = "Em Preparo";
+                } else if (pedido.status === 'PRONTO') {
+                    badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                    statusTexto = "Pronto";
+                }
+
+                // Formata Data/Hora resumida
+                const dataPedido = new Date(pedido.createdAt);
+                const horaFormatada = dataPedido.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+                // Calcula quantidade de itens total
+                const totalItens = pedido.items.reduce((acc, item) => acc + item.quantity, 0);
+
+                return `
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">
+                        <div class="p-5 border-b border-gray-100 flex items-start justify-between bg-gray-50/50">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base font-black text-dark">#${pedido.id.substring(0, 5).toUpperCase()}</span>
+                                    <span class="border text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${badgeClass}">${statusTexto}</span>
+                                </div>
+                                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mt-1">Cliente: ${pedido.customer || 'Balcão / Mesa'}</p>
+                            </div>
+                            <span class="text-xs font-bold text-gray-400">${horaFormatada}</span>
+                        </div>
+
+                        <div class="p-5 flex-1 space-y-3">
+                            <div class="max-h-40 overflow-y-auto space-y-2.5 no-scrollbar">
+                                ${pedido.items.map(item => `
+                                    <div class="flex items-start gap-3">
+                                        <span class="bg-gray-100 text-dark font-extrabold text-xs px-2 py-1 rounded-md min-w-[24px] text-center">${item.quantity}x</span>
+                                        <div class="text-sm">
+                                            <p class="font-bold text-gray-800">${item.product?.name || 'Item Desconhecido'}</p>
+                                            ${item.observations ? `<p class="text-xs text-primary font-medium mt-0.5">Obs: ${item.observations}</p>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-2">
+                            <button onclick="abrirModalPedido('${pedido.id}')" class="text-xs font-bold text-gray-600 hover:text-dark bg-gray-200/60 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors">
+                                Detalhes (${totalItens})
+                            </button>
+                            
+                            ${pedido.status === 'PENDENTE' ? `
+                                <button onclick="alterarStatusPedido('${pedido.id}', 'PREPARANDO', this)" class="bg-primary hover:bg-opacity-90 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all flex-1 text-center">
+                                    Aceitar e Preparar
+                                </button>
+                            ` : ''}
+
+                            ${pedido.status === 'PREPARANDO' ? `
+                                <button onclick="alterarStatusPedido('${pedido.id}', 'PRONTO', this)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition-all flex-1 text-center">
+                                    Concluir Preparo
+                                </button>
+                            ` : ''}
+
+                            ${pedido.status === 'PRONTO' ? `
+                                <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-100 flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    Aguardando Retirada
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function alterarStatusPedido(id, novoStatus, elementoBotao) {
+            if(elementoBotao) {
+                elementoBotao.disabled = true;
+                elementoBotao.innerText = "Atualizando...";
+            }
+
+            try {
+                const response = await fetch(`${URL_PEDIDOS}/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: novoStatus })
+                });
+
+                if (!response.ok) throw new Error("Erro ao atualizar status do pedido");
+
+                // Fecha modal caso a atualização venha de dentro dele
+                fecharModalPedido();
+                // Sincroniza dados locais
+                await carregarPedidos();
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao salvar alteração de status na API.");
+            }
+        }
+
+        // ==========================================
+        // INTERAÇÕES DE DETALHES EM MODAL
+        // ==========================================
+        function abrirModalPedido(id) {
+            const pedido = listaPedidosCache.find(p => p.id === id);
+            if (!pedido) return;
+
+            document.getElementById('modal-pedido-titulo').innerText = `Pedido #${pedido.id.substring(0, 7).toUpperCase()}`;
+            document.getElementById('modal-pedido-cliente').innerText = `Cliente: ${pedido.customer || 'Não Identificado'}`;
+
+            const containerItens = document.getElementById('modal-pedido-itens');
+            containerItens.innerHTML = pedido.items.map(item => `
+                <div class="py-3 flex items-start justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <span class="bg-gray-100 text-dark font-black text-xs px-2.5 py-1 rounded-md mt-0.5">${item.quantity}x</span>
+                        <div>
+                            <p class="font-bold text-gray-900">${item.product?.name || 'Produto Removido'}</p>
+                            <p class="text-xs text-gray-400 mt-0.5 font-medium">Categoria: ${item.product?.category?.name || 'Padrão'}</p>
+                            ${item.observations ? `<div class="bg-amber-50 border border-amber-100 text-amber-800 text-xs font-medium px-2.5 py-1.5 rounded-lg mt-2 flex items-start gap-1"><span>💡</span><p><strong>Obs:</strong> ${item.observations}</p></div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Configuração dos Botões de Ação Dinâmicos internos do Modal
+            const containerAcoes = document.getElementById('modal-pedido-acoes');
+            containerAcoes.innerHTML = "";
+
+            if (pedido.status === 'PENDENTE') {
+                containerAcoes.innerHTML = `
+                    <button onclick="alterarStatusPedido('${pedido.id}', 'PREPARANDO')" class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition-all">
+                        Iniciar Preparação na Cozinha
+                    </button>
+                `;
+            } else if (pedido.status === 'PREPARANDO') {
+                containerAcoes.innerHTML = `
+                    <button onclick="alterarStatusPedido('${pedido.id}', 'PRONTO')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition-all">
+                        Marcar como Pronto para Entrega
+                    </button>
+                `;
+            } else {
+                containerAcoes.innerHTML = `
+                    <div class="w-full bg-gray-100 border border-gray-200 text-gray-500 font-bold text-center py-3 rounded-xl text-xs uppercase tracking-wider">
+                        Pedido já finalizado pela cozinha
+                    </div>
+                `;
+            }
+
+            const modal = document.getElementById('modal-pedido');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.firstElementChild.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function fecharModalPedido() {
+            const modal = document.getElementById('modal-pedido');
+            modal.classList.add('opacity-0');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // ==========================================
+        // GERENCIAMENTO DE CATEGORIAS (CRUD BACKEND)
+        // ==========================================
+        async function carregarCategoriasCozinha() {
+            const tbody = document.getElementById('tabela-categorias-body');
+            try {
+                const response = await fetch(URL_CATEGORIAS);
+                if (!response.ok) throw new Error("Erro ao buscar categorias");
+                const categorias = await response.json();
+
+                if (categorias.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-gray-400">Nenhuma categoria cadastrada. crie uma nova para começar.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = categorias.map(cat => `
+                    <tr class="hover:bg-gray-50/80 transition-colors">
+                        <td class="px-6 py-4 font-mono text-xs text-gray-400">${cat.id}</td>
+                        <td class="px-6 py-4 font-bold text-dark text-base">${cat.name}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="abrirModalDeleteCat('${cat.id}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all">
+                                Remover
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-red-500 font-semibold">Falha ao carregar lista de categorias.</td></tr>`;
+            }
+        }
+
+        function abrirModalAddCat() {
+            document.getElementById('input-nome-categoria').value = "";
+            const modal = document.getElementById('modal-add-cat');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.firstElementChild.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function fecharModalAddCat() {
+            const modal = document.getElementById('modal-add-cat');
+            modal.classList.add('opacity-0');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        async function salvarCategoria(event) {
+            event.preventDefault();
+            const inputNome = document.getElementById('input-nome-categoria');
+            const btnSubmit = document.getElementById('btn-submit-cat');
+
+            btnSubmit.innerText = "Salvando...";
+            btnSubmit.disabled = true;
+
+            try {
+                const response = await fetch(URL_CATEGORIAS, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: inputNome.value.trim() })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || "Erro ao salvar nova categoria");
+                }
+
+                fecharModalAddCat();
+                carregarCategoriasCozinha();
+            } catch (err) {
+                console.error(err);
+                alert(`Não foi possível salvar: ${err.message}`);
+            } finally {
+                btnSubmit.innerText = "Salvar Categoria";
+                btnSubmit.disabled = false;
+            }
+        }
+
+        function abrirModalDeleteCat(id) {
+            categoryToDeleteId = id;
+            const modal = document.getElementById('modal-delete-cat');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.firstElementChild.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function fecharModalDeleteCat() {
+            categoryToDeleteId = null;
+            const modal = document.getElementById('modal-delete-cat');
+            modal.classList.add('opacity-0');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        async function confirmarExcluirCategoria() {
+            if (!categoryToDeleteId) return;
+
+            const btnExcluir = document.getElementById('btn-confirmar-excluir-cat');
+            btnExcluir.innerText = "Excluindo...";
+            btnExcluir.disabled = true;
+
+            try {
+                const response = await fetch(`${URL_CATEGORIAS}/${categoryToDeleteId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || "Erro ao excluir categoria");
+                }
+
+                alert("Categoria excluída com sucesso!");
+                fecharModalDeleteCat();
+                carregarCategoriasCozinha();
+            } catch (err) {
+                console.error(err);
+                alert(`Erro ao excluir categoria: ${err.message}`);
+            } finally {
+                btnExcluir.innerText = "Sim, Excluir";
+                btnExcluir.disabled = false;
+            }
+        }
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        
+        // Inicia carregando os pedidos e configura atualização automática a cada 10 segundos apenas na aba ativa
+        carregarPedidos();
+        
+        setInterval(() => {
+            if (activeTab === 'pedidos') {
+                carregarPedidos();
+            }
+        }, 10000);
+    </script>
+</body>
+
+</html>

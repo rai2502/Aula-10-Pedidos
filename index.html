@@ -719,9 +719,17 @@ function selecionarCategoria(id, nome) {
 async function carregarProdutos(categoriaId) {
     listaProdutos.innerHTML = '<div class="spinner"><div class="spinner-ring"></div></div>';
     try {
-        const res = await fetch(`${API_URL}/produtos?categoriaId=${categoriaId}`);
-        if (!res.ok) throw new Error('Erro na API');
-        const produtos = await res.json();
+        let res = await fetch(`${API_URL}/produtos?categoriaId=${categoriaId}`);
+        let produtos;
+        if (!res.ok) {
+            console.warn("Erro ao buscar produtos filtrados. Buscando todos os produtos e filtrando no frontend...");
+            res = await fetch(`${API_URL}/produtos`);
+            if (!res.ok) throw new Error('Erro na API');
+            const todos = await res.json();
+            produtos = todos.filter(p => p.categoria_id == categoriaId || p.categoriaId == categoriaId);
+        } else {
+            produtos = await res.json();
+        }
         renderizarProdutos(produtos);
     } catch (err) {
         console.error(err);
